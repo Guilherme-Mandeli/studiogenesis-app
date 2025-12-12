@@ -1,0 +1,63 @@
+# ------------------------------------------------------------------------------
+# Nuxt Framework & Build
+# ------------------------------------------------------------------------------
+# Directorio de build de desarrollo
+.nuxt/
+# Directorio de build de producción (Nitro)
+.output/
+# Directorio de distribución clásico
+dist/
+# Cache de nitro
+.nitro/
+# Archivos de cache
+.cache/
+
+# ------------------------------------------------------------------------------
+# Dependencias de Node (Node Modules)
+# ------------------------------------------------------------------------------
+node_modules/
+# Logs de errores de npm/yarn/pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------------------------------------------
+# Variables de Entorno y Secretos (CRÍTICO)
+# ------------------------------------------------------------------------------
+# Nunca subir claves API reales o contraseñas
+.env
+.env.production
+.env.development
+.env.local
+
+# Excepción: SÍ queremos subir el archivo de ejemplo
+!.env.example
+
+# ------------------------------------------------------------------------------
+# Supabase (CLI Local)
+# ------------------------------------------------------------------------------
+# Archivos temporales generados por Supabase CLI
+supabase/.temp/
+# Archivos de configuración de ramas locales
+supabase/.branches/
+
+# Nota: Las carpetas supabase/migrations y supabase/functions SÍ se deben subir.
+
+# ------------------------------------------------------------------------------
+# Sistema Operativo e IDEs
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Editores (VS Code, JetBrains, etc)
+.idea/
+.vscode/
+*.swp
+*.swo
