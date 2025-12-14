@@ -45,12 +45,19 @@ export class TaxonomyService extends BaseService<Category> {
         // Para este MVP, devolvemos la lista ordenada por nombre.
         const { data, error } = await this.client
             .from(this.table)
-            .select('*')
+            .select('*, product_categories(count)')
             .eq('entity_type', 'product') // Asegurar que solo traemos categorías de productos
             .order('parent_id', { ascending: true, nullsFirst: true })
             .order('name', { ascending: true });
 
         if (error) throw error;
-        return data as Category[];
+
+        // Map keys to match interface if needed, although PostgREST returns { product_categories: [{ count: N }] }
+        return data.map((item: any) => ({
+            ...item,
+            products_count: item.product_categories?.[0]?.count || 0,
+            // Clean up the pivot array from object if we want cleaner output
+            product_categories: undefined
+        })) as Category[];
     }
 }

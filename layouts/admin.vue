@@ -1,6 +1,24 @@
 <script setup lang="ts">
 const client = useSupabaseClient()
 const router = useRouter()
+const route = useRoute()
+
+// Computed logic to control auto-expansion of sidebar groups
+const accordionItems = computed(() => {
+    const isProductsActive = route.path.startsWith('/products')
+    return [{ 
+        label: 'Productos', 
+        icon: 'i-heroicons-cube', 
+        slot: 'products',
+        defaultOpen: isProductsActive
+    }]
+})
+
+// Key to force re-render/re-eval of defaultOpen when section context changes
+const activeSection = computed(() => {
+    if (route.path.startsWith('/products')) return 'products'
+    return 'none'
+})
 
 
 
@@ -44,7 +62,8 @@ const logout = async () => {
 
         <!-- Products Group -->
         <UAccordion 
-          :items="[{ label: 'Productos', icon: 'i-heroicons-cube', slot: 'products' }]"
+          :key="activeSection"
+          :items="accordionItems"
           :ui="{ wrapper: 'w-full', item: { padding: 'pt-0 pb-0' } }"
         >
           <template #default="{ item, open }">
@@ -53,6 +72,7 @@ const logout = async () => {
               color="gray"
               block
               class="justify-between text-base font-normal hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="[open ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400']"
             >
               <div class="flex items-center gap-2">
                 <UIcon :name="item.icon" class="w-5 h-5" />
@@ -67,24 +87,35 @@ const logout = async () => {
           </template>
 
           <template #products>
-            <div class="pl-4 space-y-1 mt-1">
+            <div class="pl-4 space-y-1 mt-1 bg-gray-50/50 border-l-2 border-gray-100 ml-2">
               <UButton
                 to="/products"
                 variant="ghost"
                 color="gray"
                 block
-                class="justify-start text-sm font-normal hover:bg-gray-100 dark:hover:bg-gray-700"
-                active-class="text-blue-600 dark:text-blue-400 font-medium"
+                class="justify-start text-sm font-normal text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700"
+                active-class="!text-black !font-semibold bg-gray-100"
+                :exact="true"
               >
                 Todos los productos
+              </UButton>
+              <UButton
+                to="/products/create"
+                variant="ghost"
+                color="gray"
+                block
+                class="justify-start text-sm font-normal text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700"
+                active-class="!text-black !font-semibold bg-gray-100"
+              >
+                Nuevo producto
               </UButton>
               <UButton
                 to="/products/categories"
                 variant="ghost"
                 color="gray"
                 block
-                class="justify-start text-sm font-normal hover:bg-gray-100 dark:hover:bg-gray-700"
-                active-class="text-blue-600 dark:text-blue-400 font-medium"
+                class="justify-start text-sm font-normal text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700"
+                active-class="!text-black !font-semibold bg-gray-100"
               >
                 Categorías
               </UButton>
