@@ -117,7 +117,7 @@ const handleDelete = async (id: number) => {
     }
     }
 
-const handleExport = async () => {
+const handleExport = async (format: 'xls' | 'pdf') => {
     exporting.value = true
     try {
         const result = await service.getAllWithCategories(activeFilters.value, 1, -1, sort.value)
@@ -126,13 +126,20 @@ const handleExport = async () => {
             { header: 'ID', key: 'id' },
             { header: 'Nombre', key: 'name' },
             { header: 'SKU', key: 'code' },
-            { header: 'Precio', key: 'price' },
+            { header: 'Precio', key: 'price', formatter: (val: number) => val?.toFixed(2) },
             { header: 'Estado', key: 'status' },
             { header: 'Categorías', key: 'categories', formatter: (cats: any[]) => cats ? cats.map(c => c.name).join(', ') : '' },
-            { header: 'Fecha Creación', key: 'created_at' }
+            { header: 'Fecha Creación', key: 'created_at', formatter: (val: string) => val ? new Date(val).toLocaleDateString() : '' }
         ]
 
-        ExportService.exportToExcel(result.data, exportCols, `Productos_${new Date().toISOString().split('T')[0]}`)
+        const filename = `Productos_${new Date().toISOString().split('T')[0]}`
+
+        if (format === 'xls') {
+            ExportService.exportToExcel(result.data, exportCols, filename)
+        } else {
+            ExportService.exportToPDF(result.data, exportCols, filename)
+        }
+        
     } catch (e) {
         console.error('Error exporting', e)
         alert('Error al exportar datos')
@@ -161,14 +168,15 @@ const getStatusColor = (status: string) => {
             label="Exportar | XLS" 
             icon="i-heroicons-document-arrow-down"
             :loading="exporting"
-            @click="handleExport"
+            @click="handleExport('xls')"
         />
         <UButton 
             color="white" 
             variant="solid" 
             label="Exportar | PDF" 
             icon="i-heroicons-document"
-            disabled
+            :loading="exporting"
+            @click="handleExport('pdf')"
         />
     </div>
 

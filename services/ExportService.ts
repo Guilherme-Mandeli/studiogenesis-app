@@ -6,6 +6,9 @@ export interface ExportColumn {
     formatter?: (value: any, row: any) => any;
 }
 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 export class ExportService {
     /**
      * Export data to Excel (XLSX)
@@ -41,5 +44,34 @@ export class ExportService {
 
         // Generate file
         XLSX.writeFile(wb, `${filename}.xlsx`);
+    }
+
+    /**
+     * Export data to PDF using jspdf-autotable
+     * @param data Array of objects to export
+     * @param columns Column definitions
+     * @param filename Filename without extension
+     */
+    static exportToPDF(data: any[], columns: ExportColumn[], filename: string) {
+        const doc = new jsPDF();
+
+        // Prepare table body
+        const body = data.map(row => {
+            return columns.map(col => {
+                const val = row[col.key];
+                return col.formatter ? col.formatter(val, row) : (val ?? '');
+            });
+        });
+
+        // Prepare table headers
+        const head = [columns.map(col => col.header)];
+
+        autoTable(doc, {
+            head: head,
+            body: body,
+            // Styling is not important, but defaults are usually fine
+        });
+
+        doc.save(`${filename}.pdf`);
     }
 }
