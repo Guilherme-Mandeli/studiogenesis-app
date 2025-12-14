@@ -13,6 +13,7 @@ import { TaxonomyService } from '~/services/TaxonomyService'
 import type { FilterDefinition } from '~/types'
 
 import SortableHeader from '~/components/common/SortableHeader.vue'
+import { ExportService } from '~/services/ExportService'
 
 definePageMeta({
   layout: 'admin'
@@ -24,6 +25,7 @@ const taxonomyService = new TaxonomyService(client)
 
 const products = ref<Product[]>([])
 const loading = ref(true)
+const exporting = ref(false)
 
 // Filters
 const activeFilters = ref({
@@ -113,6 +115,30 @@ const handleDelete = async (id: number) => {
         console.error('Error deleting product', e)
         alert('Error al eliminar producto')
     }
+    }
+
+const handleExport = async () => {
+    exporting.value = true
+    try {
+        const result = await service.getAllWithCategories(activeFilters.value, 1, -1, sort.value)
+        
+        const exportCols = [
+            { header: 'ID', key: 'id' },
+            { header: 'Nombre', key: 'name' },
+            { header: 'SKU', key: 'code' },
+            { header: 'Precio', key: 'price' },
+            { header: 'Estado', key: 'status' },
+            { header: 'Categorías', key: 'categories', formatter: (cats: any[]) => cats ? cats.map(c => c.name).join(', ') : '' },
+            { header: 'Fecha Creación', key: 'created_at' }
+        ]
+
+        ExportService.exportToExcel(result.data, exportCols, `Productos_${new Date().toISOString().split('T')[0]}`)
+    } catch (e) {
+        console.error('Error exporting', e)
+        alert('Error al exportar datos')
+    } finally {
+        exporting.value = false
+    }
 }
 
 const getStatusColor = (status: string) => {
@@ -127,6 +153,25 @@ const getStatusColor = (status: string) => {
 
 <template>
   <div class="p-6">
+    <!-- Export Actions -->
+    <div class="flex gap-2 justify-end mb-4">
+        <UButton 
+            color="white" 
+            variant="solid" 
+            label="Exportar | XLS" 
+            icon="i-heroicons-document-arrow-down"
+            :loading="exporting"
+            @click="handleExport"
+        />
+        <UButton 
+            color="white" 
+            variant="solid" 
+            label="Exportar | PDF" 
+            icon="i-heroicons-document"
+            disabled
+        />
+    </div>
+
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Productos</h1>
       <UButton to="/products/create" color="black" icon="i-heroicons-plus">

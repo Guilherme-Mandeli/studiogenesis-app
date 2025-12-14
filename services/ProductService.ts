@@ -164,9 +164,12 @@ export class ProductService extends BaseService<Product> {
         }
 
         // Pagination
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize - 1;
-        query = query.range(from, to);
+        // Pagination
+        if (pageSize > 0) {
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
+            query = query.range(from, to);
+        }
 
         const { data, error, count } = await query;
 
