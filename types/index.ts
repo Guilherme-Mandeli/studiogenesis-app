@@ -72,3 +72,17 @@ export interface Product extends Entity {
     // Virtual for Many-to-Many
     categories?: number[] | Category[];
 }
+
+/**
+ * Appointment / Cita
+ */
+export interface Appointment extends BaseEntity {
+    product_id: number;
+    date: string; // YYYY-MM-DD
+    units: number;
+    total_cost: number;
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+
+    // Virtual
+    product?: Product;
+}

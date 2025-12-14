@@ -12,10 +12,13 @@
   "dependencies": {
     "@nuxt/ui": "^2.11.1",
     "@nuxtjs/supabase": "^1.1.4",
+    "@popperjs/core": "^2.11.8",
     "@supabase/supabase-js": "^2.87.1",
+    "date-fns": "^2.30.0",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "nuxt": "^4.2.2",
+    "v-calendar": "^3.1.2",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
     "xlsx": "^0.18.5"

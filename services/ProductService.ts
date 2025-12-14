@@ -183,4 +183,39 @@ export class ProductService extends BaseService<Product> {
 
         return { data: products, count: count || 0 };
     }
+
+    /**
+     * Get product price effectively at a given date
+     * Checks tariffs first, fallback to base price
+     */
+    async getPriceAtDate(id: number, date: string): Promise<number> {
+        // 1. Get Product with Tariffs
+        const { data: product, error } = await this.client
+            .from(this.table)
+            .select('price, tariffs')
+            .eq('id', id)
+            .single();
+
+        if (error || !product) throw error || new Error('Producto no encontrado');
+
+        // 2. Check Tariffs
+        const tariffs = (product.tariffs as any[]) || [];
+        const targetDate = new Date(date);
+
+        // Sort tariffs by start_date desc to find the most recent applicable one
+        // Filter valid tariffs for the date
+        const applicableTariff = tariffs
+            .filter((t: any) => {
+                const start = new Date(t.start_date);
+                const end = t.end_date ? new Date(t.end_date) : null;
+                return start <= targetDate && (!end || end >= targetDate);
+            })
+            .sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0];
+
+        if (applicableTariff) {
+            return Number(applicableTariff.price);
+        }
+
+        return Number(product.price);
+    }
 }
