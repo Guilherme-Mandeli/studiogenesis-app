@@ -117,9 +117,9 @@ const handleDelete = async (id: number) => {
 
 const getStatusColor = (status: string) => {
     switch(status) {
-        case 'active': return 'green'
-        case 'draft': return 'gray'
-        case 'pending': return 'orange'
+        case 'Activo': return 'green'
+        case 'Borrador': return 'gray'
+        case 'Pendiente': return 'orange'
         default: return 'gray'
     }
 }

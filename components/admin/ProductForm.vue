@@ -167,7 +167,7 @@ defineExpose({
                 </UFormGroup>
                  <UFormGroup label="Estado" name="status">
                     <!-- Mapped options could be improved here too but explicit request was for Tariffs -->
-                    <USelect v-model="form.status" :options="['active', 'draft', 'pending']" />
+                    <USelect v-model="form.status" :options="['Activo', 'Borrador', 'Pendiente']" />
                 </UFormGroup>
             </div>
             
