@@ -1,75 +1,117 @@
-# Nuxt Minimal Starter
+# StudioGenesis - App de Gestión
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Este repositorio contiene el código fuente de un test para **StudioGenesis**, una aplicación de gestión administrativa (Backoffice).
 
-## Setup
+---
 
-Make sure to install dependencies:
+## Instalación y Ejecución Local
 
-```bash
-# npm
-npm install
+Sigue estos pasos para poner en marcha el proyecto en tu entorno local.
 
-# pnpm
-pnpm install
+### Prerrequisitos
+*   **Node.js**: v18 o superior.
+*   **NPM**: (Incluido con Node.js) o Yarn/Pnpm.
+*   **Git**: Para clonar el repositorio.
 
-# yarn
-yarn install
+### Pasos
 
-# bun
-bun install
-```
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone https://github.com/Guilherme-Mandeli/studiogenesis-app.git
+    cd studiogenesis-test
+    ```
 
-## Development Server
+2.  **Acceder al directorio de la aplicación:**
+    El código de la aplicación se encuentra en la carpeta `genesis-app`.
+    ```bash
+    cd genesis-app
+    ```
 
-Start the development server on `http://localhost:3000`:
+3.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
 
-```bash
-# npm
-npm run dev
+4.  **Configurar Variables de Entorno:**
+    Renombra el archivo `.env.example` a `.env` (si existe) o crea uno nuevo en la raíz de `genesis-app`. Necesitarás las credenciales de tu proyecto Supabase:
 
-# pnpm
-pnpm dev
+    ```env
+    SUPABASE_URL="https://tu-proyecto.supabase.co"
+    SUPABASE_KEY="tu-anon-key"
+    ```
 
-# yarn
-yarn dev
+5.  **Ejecutar el servidor de desarrollo:**
+    ```bash
+    npm run dev
+    ```
+    La aplicación estará disponible en `http://localhost:3000`.
 
-# bun
-bun run dev
-```
+---
 
-## Production
+## 🗄️ Configuración de Base de Datos (Supabase)
 
-Build the application for production:
+Para inicializar la base de datos con el esquema y datos de prueba, siga estos pasos en el Editor SQL de su proyecto Supabase:
 
-```bash
-# npm
-npm run build
+1.  **Crear el Esquema:**
+    Copie y ejecute el contenido del archivo:
+    `genesis-app/supabase/create-supabase.db`
+    *Esto creará las tablas (productos, categorías, citas), funciones y políticas de seguridad.*
 
-# pnpm
-pnpm build
+2.  **Cargar Datos de Prueba (Seed):**
+    Una vez creado el esquema, copie y ejecute el contenido del archivo:
+    `genesis-app/supabase/update/seed_data.sql`
+    *Esto insertará un set de datos inicial con:*
+    *   *Categorías de mercado (Alimentos, Lácteos, Carnes).*
+    *   *12 Productos genericos (Leche, Huevos, Pollo, etc.) con histórico de tarifas.*
+    *   *Citas/Pedidos de ejemplo para Diciembre 2025 y Enero 2026.*
 
-# yarn
-yarn build
+---
 
-# bun
-bun run build
-```
+## Sobre el Proyecto
 
-Locally preview production build:
+StudioGenesis ha sido desarrollado siguiendo la filosofía **KISS (Keep It Simple, Stupid)** y principios de **Modularidad**.
 
-```bash
-# npm
-npm run preview
+### Stack Tecnológico
 
-# pnpm
-pnpm preview
+*   **Frontend**: [Nuxt 3](https://nuxt.com/) (Vue.js) - Framework Híbrido.
+*   **Backend / DB**: [Supabase](https://supabase.com/) - PostgreSQL + Auth instantáneo.
+*   **UI Framework**: [Nuxt UI](https://ui.nuxt.com/) + Tailwind CSS.
+*   **Lenguaje**: TypeScript Estricto.
 
-# yarn
-yarn preview
+### Arquitectura del Código
 
-# bun
-bun run preview
-```
+El proyecto evita el "Spaghetti Code" mediante una clara separación de responsabilidades en capas, implementada dentro de la estructura de Nuxt:
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+1.  **Capa de Servicios (`/services`)**:
+    *   Toda la lógica de comunicación con Supabase reside aquí.
+    *   Extienden de una clase abstracta `BaseService` para estandarizar operaciones CRUD.
+    *   Ejemplos: `ProductService`, `TaxonomyService`, `AppointmentService`.
+
+2.  **Capa de Validación (`/validators`)**:
+    *   Clases estáticas dedicadas a validar la integridad de los datos antes de enviarlos al servidor.
+    *   Centralizan reglas de negocio (ej: validación de tarifas, campos obligatorios).
+
+3.  **Capa de Vista (`/pages` y `/components`)**:
+    *   **Pages**: Estructura de rutas y vistas principales.
+    *   **Components**: Elementos de UI reutilizables (ej: `SortableHeader`, `DataFilter`).
+
+### Módulos Principales Implementados
+
+#### 1. Gestión de Productos
+*   **Inventario Completo**: Creación y edición con campos personalizados.
+*   **Taxonomías**: Organización jerárquica mediante Categorías (Padre/Hijo).
+*   **Tarifas Dinámicas**: Sistema avanzado donde un producto tiene múltiples tarifas con rangos de fechas de validez. Se implementan como un campo JSONB (`tariffs`) dentro de la entidad Producto.
+*   **Galería**: Gestión de imágenes múltiples.
+
+#### 2. Citas y Pedidos
+*   **Vinculación**: Las citas se asocian directamente a productos.
+*   **Cálculo de Precios**: Al crear una cita, el sistema determina automáticamente la tarifa vigente del producto para la fecha seleccionada y "bloquea" ese precio (`locked_price`), asegurando la integridad histórica de los pedidos.
+
+#### 3. Panel de Administración
+*   **Autenticación**: Acceso restringido (Middleware global) para usuarios administradores.
+*   **Diseño**: Interfaz tipo Dashboard con barra lateral fija (`layouts/admin.vue`).
+*   **Herramientas**: Filtrado avanzado, ordenación de columnas y descarga de listados en Excel/PDF (generación en cliente).
+
+---
+
+> **Nota:** La documentación técnica detallada para gestores se encuentra en el archivo [`Documentacion.md`](Documentacion.md) en la raíz de este proyecto.
