@@ -1,6 +1,6 @@
 # StudioGenesis - App de Gestión
 
-Este repositorio contiene el código fuente de un test para **StudioGenesis**, una aplicación de gestión administrativa (Backoffice).
+Este repositorio contiene el código fuente de un test para **Studio Genesis**, una aplicación de gestión administrativa (Backoffice).
 
 ---
 
