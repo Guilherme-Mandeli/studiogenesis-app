@@ -34,7 +34,7 @@ const filterDefinitions = ref<FilterDefinition[]>([
 // Sorting
 const { sort, handleSort } = useTableSort({ column: 'name', direction: 'asc' })
 
-// Definition of table columns
+// Definición de columnas de la tabla
 const columns = [
   { key: 'name', label: 'Nombre' },
   { key: 'products_count', label: 'Productos' },
@@ -43,47 +43,45 @@ const columns = [
   { key: 'actions' }
 ]
 
-// Fetch data
+// Obtener datos
 const { data: rawCategories, refresh, pending } = await useAsyncData<Category[]>('categories', () => service.getTree())
 
 /**
- * Interface extension for UI Logic
+ * Extensión de interfaz para lógica UI
  */
 interface CategoryWithDepth extends Category {
   depth: number;
 }
 
 /**
- * Recursively build a flat list with depth from the category tree/list.
+ * Construir recursivamente una lista plana con profundidad desde el árbol/lista de categorías.
  * 
- * Logic:
- * 1. Find root nodes (parent_id is null).
- * 2. For each root, add to list, then find children and recurse.
+ * Lógica:
+ * 1. Encontrar nodos raíz (parent_id es null).
+ * 2. Para cada raíz, añadir a la lista, luego buscar hijos y recursar.
  */
 const buildHierarchy = (cats: Category[]): CategoryWithDepth[] => {
   if (!cats) return []
 
   const result: CategoryWithDepth[] = []
   
-  // Helper to find children
+  // Helper para buscar hijos
   const getChildren = (parentId: number | null) => 
     cats.filter(c => c.parent_id === parentId).sort((a, b) => a.name.localeCompare(b.name))
 
-  // Recursive adder
   const addCategory = (cat: Category, depth: number) => {
     result.push({ ...cat, depth })
     const children = getChildren(cat.id)
     children.forEach(child => addCategory(child, depth + 1))
   }
 
-  // Start with top-level categories
   const roots = getChildren(null)
   roots.forEach(root => addCategory(root, 0))
 
   return result
 }
 
-// Compute the sorted hierarchical list
+// Computar lista jerárquica ordenada
 const categories = computed(() => {
     let list = rawCategories.value || []
 
@@ -97,7 +95,7 @@ const categories = computed(() => {
     }
 
     // 2. Hierarchy vs Flat Sort
-    // If we have search, or non-default sort, we treat as flat list
+    // Si tenemos búsqueda o un orden no por defecto, tratamos como lista plana
     const isDefaultSort = sort.value.column === 'name' && sort.value.direction === 'asc' && !activeFilters.value.search
     
     let result: CategoryWithDepth[] = []
@@ -132,7 +130,7 @@ const categories = computed(() => {
     return result
 })
 
-// Client-side pagination
+// Paginación del lado del cliente
 const page = ref(1)
 const pageCount = ref(10)
 
@@ -144,7 +142,7 @@ const paginatedCategories = computed(() => {
 
 
 /**
- * Handle Delete Category
+ * Manejar eliminación de categoría
  */
 const handleDelete = async (id: number) => {
   if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) return

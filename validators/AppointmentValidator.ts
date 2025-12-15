@@ -5,15 +5,21 @@ export interface ValidationError {
     message: string;
 }
 
+/**
+ * Validador para Citas (Appointments)
+ * 
+ * Centraliza la lógica de validación tanto para creación como actualización.
+ * Permite validar campos obligatorios o reglas de negocio específicas (ej. unidades > 0).
+ */
 export class AppointmentValidator {
-    static validate(data: Partial<Appointment>): ValidationError[] {
+    static validate(data: Partial<Appointment>, isUpdate: boolean = false): ValidationError[] {
         const errors: ValidationError[] = [];
 
-        if (!data.product_id) {
+        if (!isUpdate && !data.product_id) {
             errors.push({ field: 'product_id', message: 'El producto es obligatorio' });
         }
 
-        if (!data.date) {
+        if (!isUpdate && !data.date) {
             errors.push({ field: 'date', message: 'La fecha es obligatoria' });
         }
 

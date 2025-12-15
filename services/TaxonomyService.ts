@@ -52,11 +52,11 @@ export class TaxonomyService extends BaseService<Category> {
 
         if (error) throw error;
 
-        // Map keys to match interface if needed, although PostgREST returns { product_categories: [{ count: N }] }
+        // Mapear claves para coincidir con la interfaz si es necesario, aunque PostgREST devuelve { product_categories: [{ count: N }] }
         return data.map((item: any) => ({
             ...item,
             products_count: item.product_categories?.[0]?.count || 0,
-            // Clean up the pivot array from object if we want cleaner output
+            // Limpiar el array pivote del objeto si queremos una salida más limpia
             product_categories: undefined
         })) as Category[];
     }

@@ -41,7 +41,7 @@ const filterDefinitions = ref<FilterDefinition[]>([
         { label: 'Borrador', value: 'draft' },
         { label: 'Pendiente', value: 'pending' }
     ]},
-    { key: 'category_id', label: 'Categoría', type: 'select', options: [] } // Options loaded on mount
+    { key: 'category_id', label: 'Categoría', type: 'select', options: [] }
 ])
 
 const columns = [
@@ -76,12 +76,12 @@ const fetchProducts = async () => {
     }
 }
 
-// Watch sort change to refetch
+// Observar cambios en ordenamiento para recargar
 watch(sort, () => {
     fetchProducts()
 })
 
-// Reset page on filter
+// Resetear página al filtrar
 watch(activeFilters, () => {
     page.value = 1
 }, { deep: true })
@@ -92,7 +92,6 @@ watch([page, pageSize], () => {
 })
 
 onMounted(async () => {
-    // Load categories for filter
     try {
         const cats = await taxonomyService.getTree()
         const catFilter = filterDefinitions.value.find(f => f.key === 'category_id')

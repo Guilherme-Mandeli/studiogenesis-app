@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-// Service for fetching parent options
+// Servicio para obtener opciones de padres
 const client = useSupabaseClient()
 const service = new TaxonomyService(client)
 
@@ -36,7 +36,6 @@ const form = reactive<Partial<Category>>({
 // Validation State
 const errors = reactive<{ [key: string]: string }>({})
 
-// Options for Parent Selector
 const parentOptions = ref<{ id: number; label: string }[]>([])
 
 // Fetch categories on mount
@@ -44,9 +43,9 @@ onMounted(async () => {
   try {
     const categories = await service.getTree()
     
-    // Filter options:
-    // 1. Remove current category (if editing) to avoid self-parenting
-    // 2. Map to { id, label } for SelectMenu
+    // Filtrar opciones:
+    // 1. Eliminar categoría actual (si se edita) para evitar auto-parentesco
+    // 2. Mapear a { id, label } para SelectMenu
     parentOptions.value = categories
       .filter(c => !props.isEdit || c.id !== props.initialData?.id)
       .map(c => ({
@@ -60,10 +59,9 @@ onMounted(async () => {
   }
 })
 
-// Slugify logic
+// Slugify
 watch(() => form.name, (newVal) => {
   if (!props.isEdit && newVal) {
-    // Clear name error if typing
     if (errors.name) delete errors.name
 
     form.slug = newVal
@@ -75,7 +73,6 @@ watch(() => form.name, (newVal) => {
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '')
       
-    // Clear slug error if typing
     if (errors.slug) delete errors.slug
   }
 })
@@ -85,17 +82,16 @@ watch(() => form.slug, () => {
 })
 
 const handleSubmit = () => {
-  // Clear previous errors
+  // Limpiar errores previos
   Object.keys(errors).forEach(key => delete errors[key])
 
-  // Validate
   const validationErrors = CategoryValidator.validate(form)
   
   if (validationErrors.length > 0) {
     validationErrors.forEach(err => {
       errors[err.field] = err.message
     })
-    return // Stop submission
+    return // Detener envío
   }
 
   emit('submit', form)

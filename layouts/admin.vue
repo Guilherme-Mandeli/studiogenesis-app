@@ -3,7 +3,7 @@ const client = useSupabaseClient()
 const router = useRouter()
 const route = useRoute()
 
-// Computed logic to control auto-expansion of sidebar groups
+// Lógica computada para controlar la expansión automática de grupos de la barra lateral
 const accordionItems = computed(() => {
     const isProductsActive = route.path.startsWith('/products')
     return [{ 
@@ -14,7 +14,7 @@ const accordionItems = computed(() => {
     }]
 })
 
-// Key to force re-render/re-eval of defaultOpen when section context changes
+// Clave para forzar re-renderizado/reevalidación de defaultOpen cuando cambia el contexto de la sección
 const activeSection = computed(() => {
     if (route.path.startsWith('/products')) return 'products'
     return 'none'
@@ -23,11 +23,11 @@ const activeSection = computed(() => {
 
 
 const logout = async () => {
-  // Clear dev token
+  // Limpiar token dev
   const devToken = useCookie('dev_token')
   devToken.value = null
 
-  // Try Supabase logout
+  // Intentar cierre de sesión en Supabase
   await client.auth.signOut()
   
   router.push('/login')
@@ -60,7 +60,7 @@ const logout = async () => {
           Inicio
         </UButton>
 
-        <!-- Products Group -->
+        <!-- Grupo Productos -->
         <UAccordion 
           :key="activeSection"
           :items="accordionItems"
@@ -72,7 +72,7 @@ const logout = async () => {
               color="gray"
               block
               class="justify-between text-base font-normal hover:bg-gray-100 dark:hover:bg-gray-700"
-              :class="[open ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500 dark:text-gray-400']"
+              :class="[open ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-700 dark:text-gray-400']"
             >
               <div class="flex items-center gap-2">
                 <UIcon :name="item.icon" class="w-5 h-5" />

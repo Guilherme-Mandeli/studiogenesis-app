@@ -37,11 +37,12 @@ const isOpen = computed({
     set: (val) => emit('update:modelValue', val)
 })
 
-// Validation
+// Validación
 const errors = ref<{ field: string, message: string }[]>([])
 const getError = (field: string) => errors.value.find(e => e.field === field)?.message
 
-// Helper to calculate price for a product on the SELECTED date
+// Ayudante para calcular el precio de un producto en la fecha SELECCIONADA
+// Comprueba si hay tarifas vigentes para la fecha y devuelve el precio ajustado.
 const getCalculatedPrice = (product: Product): { original: number, current: number, hasTariff: boolean } => {
     const original = product.price
     if (!form.value.date) return { original, current: original, hasTariff: false }
@@ -63,11 +64,11 @@ const getCalculatedPrice = (product: Product): { original: number, current: numb
     return { original, current: original, hasTariff: false }
 }
 
-// Load Data
+// Cargar Datos
 onMounted(async () => {
     loading.value = true
     try {
-        // Load Products for selector
+        // Cargar productos para el selector
         const res = await productService.getAllWithCategories(undefined, 1, -1) // Get all
         products.value = res.data
 
@@ -77,7 +78,7 @@ onMounted(async () => {
                 form.value = { ...apt }
             }
         } 
-        // Initial Date logic handled by watch to ensure reactivity when prop changes
+        // La lógica de la Fecha Inicial se maneja mediante un 'watch' para asegurar la reactividad cuando cambia la 'prop'.
     } catch (e) {
         console.error(e)
     } finally {
@@ -85,14 +86,15 @@ onMounted(async () => {
     }
 })
 
-// Watch initialDate prop to update form
+// Observar cambios en la prop initialDate para actualizar el formulario
 watch(() => props.initialDate, (newDate) => {
     if (newDate) {
         form.value.date = newDate.toISOString().split('T')[0]
     }
 }, { immediate: true })
 
-// Watchers for Price Calculation
+// Observadores para el cálculo de precios
+// Recalcula el precio si cambia el producto o la fecha.
 watch([() => form.value.product_id, () => form.value.date], async ([pid, date]) => {
     if (!pid || !date) {
         currentPrice.value = null
@@ -100,13 +102,13 @@ watch([() => form.value.product_id, () => form.value.date], async ([pid, date]) 
     }
 
     try {
-        // We can use the helper locally since we loaded all products with tariffs
+        // Podemos usar el ayudante localmente ya que cargamos todos los productos con tarifas
         const product = products.value.find(p => p.id === pid)
         if (product) {
             const calculated = getCalculatedPrice(product)
             currentPrice.value = calculated.current
         } else {
-             // Fallback to service if product not in list (rare)
+             // Recurrir al servicio si el producto no está en la lista (poco probable)
             const price = await productService.getPriceAtDate(pid, date)
             currentPrice.value = price
         }
@@ -128,7 +130,7 @@ const handleSave = async () => {
     try {
         const payload = {
             ...form.value,
-            total_cost: estimatedCost.value // Snapshot cost
+            total_cost: estimatedCost.value // Costo instantáneo al momento de guardar
         }
 
         if (payload.id) {
@@ -156,7 +158,7 @@ const handleSave = async () => {
             </template>
 
             <div class="space-y-4 py-4">
-                 <!-- Date Picker (First, because price depends on it) -->
+                 <!-- Selector de Fecha (Primero, porque el precio depende de ella) -->
                  <UFormGroup label="Fecha" :error="getError('date')" required>
                      <VDatePicker v-model="form.date" mode="date" :model-config="{ type: 'string', mask: 'YYYY-MM-DD' }">
                         <template #default="{ togglePopover, inputValue, inputEvents }">
@@ -171,7 +173,7 @@ const handleSave = async () => {
                      </VDatePicker>
                 </UFormGroup>
 
-                <!-- Product Selector -->
+                <!-- Selector de Producto -->
                 <UFormGroup label="Producto" :error="getError('product_id')" required>
                     <USelectMenu
                         v-model="form.product_id"
@@ -188,9 +190,9 @@ const handleSave = async () => {
                                     <span class="text-xs text-gray-500">SKU: {{ option.code }}</span>
                                 </div>
                                 <div class="flex flex-col items-end text-sm">
-                                    <!-- Price Calculation Display -->
+                                    <!-- Visualización del Cálculo de Precio -->
                                     <template v-if="form.date">
-                                        <div v-if="getCalculatedPrice(option).hasTariff" class="flex flex-col items-end">
+                                        <div v-if="getCalculatedPrice(option).hasTariff" class="flex ml-3 flex-row gap-2 items-center">
                                             <span class="line-through text-gray-400 text-xs">{{ option.price }}€</span>
                                             <span 
                                                 class="font-bold" 
@@ -208,12 +210,12 @@ const handleSave = async () => {
                     </USelectMenu>
                 </UFormGroup>
 
-                <!-- Units -->
+                <!-- Unidades -->
                 <UFormGroup label="Unidades" :error="getError('units')" required>
                     <UInput v-model.number="form.units" type="number" min="1" />
                 </UFormGroup>
 
-                <!-- Cost Summary -->
+                <!-- Resumen de Costos -->
                 <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between text-sm mb-1">
                         <span class="text-gray-600">Tarifa Vigente:</span>
@@ -225,9 +227,19 @@ const handleSave = async () => {
                     </div>
                 </div>
 
-                <!-- Status (Only for edit) -->
+                <!-- Estado (Solo para edición) -->
                 <UFormGroup v-if="form.id" label="Estado">
-                    <USelect v-model="form.status" :options="['pending', 'confirmed', 'completed', 'cancelled']" />
+                    <USelect 
+                        v-model="form.status" 
+                        :options="[
+                            { label: 'Pendiente', value: 'pending' },
+                            { label: 'Confirmada', value: 'confirmed' },
+                            { label: 'Concluida', value: 'completed' },
+                            { label: 'Cancelada', value: 'cancelled' }
+                        ]"
+                        option-attribute="label"
+                        value-attribute="value"
+                    />
                 </UFormGroup>
             </div>
 

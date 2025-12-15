@@ -42,14 +42,13 @@ const form = reactive<Partial<Product>>({
 const errors = reactive<{ [key: string]: string }>({})
 const categoryOptions = ref<{ id: number; label: string }[]>([])
 
-// Tariff Options in Spanish
+// Opciones de Tarifa
 const tariffStatusOptions = [
     { label: 'Activa', value: 'active' },
     { label: 'Caducada', value: 'expired' },
     { label: 'Inactiva', value: 'inactive' }
 ]
 
-// Load categories
 onMounted(async () => {
     try {
         const cats = await taxonomyService.getTree()
@@ -59,7 +58,8 @@ onMounted(async () => {
     }
 })
 
-// Slug Auto-generator
+// Auto-generador de slug
+// Elimina acentos y caracteres especiales, y reemplaza espacios por guiones.
 watch(() => form.name, (newVal) => {
   if (!props.isEdit && newVal) {
     if (errors.name) delete errors.name
@@ -71,7 +71,7 @@ watch(() => form.name, (newVal) => {
   }
 })
 
-// Price Mask (2 decimals)
+// Máscara de Precio (2 decimales)
 const formatPrice = (field: 'price' | 'tariff', index?: number) => {
     if (field === 'price') {
         const val = parseFloat(form.price?.toString() || '0')
@@ -82,7 +82,7 @@ const formatPrice = (field: 'price' | 'tariff', index?: number) => {
     }
 }
 
-// Tariff Management
+// Gestión de Tarifas
 const addTariff = () => {
     if (!form.tariffs) form.tariffs = []
     form.tariffs.push({
@@ -97,7 +97,7 @@ const removeTariff = (index: number) => {
     if (form.tariffs) form.tariffs.splice(index, 1)
 }
 
-// Gallery Management
+// Gestión de Galería
 const addGalleryImage = () => {
     if (!form.gallery) form.gallery = []
     form.gallery.push('')
@@ -107,9 +107,9 @@ const removeGalleryImage = (index: number) => {
     if (form.gallery) form.gallery.splice(index, 1)
 }
 
-// Image Selection Simulation
+// Simulación de Selección de Imagen
 const selectImage = (target: 'main' | 'gallery', index?: number) => {
-    // Simulated action
+    // Acción simulada
     const url = prompt("Introduce la URL de la imagen (Simulación de selección):", "https://placehold.co/600x400")
     if (url) {
         if (target === 'main') {
@@ -120,7 +120,7 @@ const selectImage = (target: 'main' | 'gallery', index?: number) => {
     }
 }
 
-// Submission
+// Envío del formulario
 const handleSubmit = () => {
     Object.keys(errors).forEach(key => delete errors[key])
     
@@ -145,7 +145,7 @@ defineExpose({
   <form @submit.prevent="handleSubmit" class="space-y-6 max-w-4xl">
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Basic Info -->
+        <!-- Información Básica -->
         <div class="space-y-4">
             <h3 class="text-lg font-semibold">Información General</h3>
             
@@ -166,7 +166,7 @@ defineExpose({
                     <UInput v-model="form.price" type="number" step="0.01" @blur="formatPrice('price')" />
                 </UFormGroup>
                  <UFormGroup label="Estado" name="status">
-                    <!-- Mapped options could be improved here too but explicit request was for Tariffs -->
+                    <!-- Las opciones mapeadas podrían mejorarse aquí también, pero usaremos solo Tarifas -->
                     <USelect v-model="form.status" :options="['Activo', 'Borrador', 'Pendiente']" />
                 </UFormGroup>
             </div>
@@ -176,7 +176,7 @@ defineExpose({
             </UFormGroup>
         </div>
 
-        <!-- Description & Image -->
+        <!-- Descripción e Imagen -->
         <div class="space-y-4">
             <h3 class="text-lg font-semibold">Detalles</h3>
             <UFormGroup label="Descripción" name="description">
@@ -250,7 +250,7 @@ defineExpose({
         </div>
     </div>
 
-    <!-- Actions -->
+    <!-- Acciones -->
     <div class="flex items-center gap-4 pt-6 border-t">
       <UButton type="submit" color="black" :loading="loading" size="lg">
         {{ isEdit ? 'Actualizar Producto' : 'Guardar Producto' }}

@@ -21,7 +21,7 @@ const loading = ref(false)
 const handleSubmit = async (data: Partial<Category>) => {
   loading.value = true
   try {
-    // Ensure entity_type is set
+    // Asegurar que entity_type esté establecido
     data.entity_type = 'product'
     
     await service.create(data)

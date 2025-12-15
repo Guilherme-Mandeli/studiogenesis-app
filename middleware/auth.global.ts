@@ -8,7 +8,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
     const user = useSupabaseUser()
     const devToken = useCookie('dev_token')
 
-    // Check if user is authenticated via Supabase OR has a dev token
     const isAuthenticated = user.value || devToken.value === 'true'
 
     // 1. Si el usuario YA está logueado y quiere ir al Login, lo mandamos al Home.

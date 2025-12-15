@@ -2,8 +2,8 @@
 /**
  * SortableHeader Component
  * 
- * Reusable table header with sort controls.
- * Displays label and up/down indicators.
+ * Cabecera de tabla reutilizable con controles de ordenamiento.
+ * Muestra etiqueta e indicadores arriba/abajo.
  */
 
 const props = defineProps<{
@@ -37,13 +37,13 @@ const toggleSort = () => {
   >
     <span>{{ label }}</span>
     <div class="flex flex-col gap-[2px]">
-        <!-- Up Chevron (ASC) - Transparent if not ASC -->
+        <!-- Up Chevron (ASC) - Claro si no es ASC -->
         <UIcon 
             name="i-heroicons-chevron-up-20-solid" 
             class="w-3 h-3 -mb-1"
             :class="[isAsc ? 'opacity-100 text-black dark:text-white' : 'opacity-40 group-hover:opacity-60']"
         />
-        <!-- Down Chevron (DESC) - Transparent if not DESC -->
+        <!-- Down Chevron (DESC) - Claro si no es DESC -->
          <UIcon 
             name="i-heroicons-chevron-down-20-solid" 
             class="w-3 h-3"

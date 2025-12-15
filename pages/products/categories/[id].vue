@@ -21,7 +21,7 @@ const toast = useToast()
 const id = Number(route.params.id)
 const loading = ref(false)
 
-// Fetch data server-side or on hydration
+// Obtener datos del lado del servidor o en hidratación
 const { data: category, error: fetchError } = await useAsyncData<Category | null>(
   `category-${id}`, 
   () => service.getById(id)
@@ -29,7 +29,7 @@ const { data: category, error: fetchError } = await useAsyncData<Category | null
 
 // Handle 404 or Error
 if (fetchError.value || !category.value) {
-  // If running on client, redirect. On server, we might want to handle differently but this is fine for SPA feel.
+  // Si estamos en el cliente, redirigir. En el servidor podríamos querer manejarlo diferente, pero esto está bien para sensación SPA.
   if (import.meta.client) {
      toast.add({ title: 'Error', description: 'No se pudo cargar la categoría.', color: 'red' })
      router.push('/products/categories')

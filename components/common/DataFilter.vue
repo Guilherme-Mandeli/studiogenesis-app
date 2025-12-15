@@ -11,7 +11,7 @@ const props = defineProps<{
     filters: FilterDefinition[]
     modelValue: { [key: string]: any }
     loading?: boolean
-    pageSize?: number // Optional v-model for page size
+    pageSize?: number // opcional para tamaño de página
 }>()
 
 const emit = defineEmits<{
@@ -21,7 +21,7 @@ const emit = defineEmits<{
     (e: 'reset'): void
 }>()
 
-// Page Size logic
+// Lógica de tamaño de página
 const localPageSize = ref(props.pageSize || 10)
 watch(() => props.pageSize, (val) => localPageSize.value = val || 10)
 watch(localPageSize, (val) => emit('update:pageSize', val))
@@ -29,16 +29,16 @@ watch(localPageSize, (val) => emit('update:pageSize', val))
 
 const localFilters = reactive<{ [key: string]: any }>({ ...props.modelValue })
 
-// Watch for external changes
+// Observar cambios
 watch(() => props.modelValue, (newVal) => {
     Object.assign(localFilters, newVal)
 })
 
-// Update parent on change
+// Actualizar padre al cambiar
 const updateFilter = (key: string, value: any) => {
     localFilters[key] = value
     emit('update:modelValue', localFilters)
-    // Debounce could be added here if we want auto-search
+    // Se podría agregar debounce aquí si queremos búsqueda automática
 }
 
 const handleSearch = () => {
@@ -46,7 +46,7 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-    // Reset all fields
+    // Limpiar todos los campos
     props.filters.forEach(f => {
         localFilters[f.key] = undefined
     })

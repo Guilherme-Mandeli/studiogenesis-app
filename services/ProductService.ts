@@ -131,7 +131,7 @@ export class ProductService extends BaseService<Product> {
         pageSize: number = 10,
         sort: { column: string, direction: 'asc' | 'desc' } = { column: 'created_at', direction: 'desc' }
     ): Promise<{ data: Product[], count: number }> {
-        // Query base with join
+        // Query base con join
 
         let selectQuery = '*, product_categories(category:categories(id, name))';
         if (filters?.category_id) {
@@ -142,10 +142,9 @@ export class ProductService extends BaseService<Product> {
             .from(this.table)
             .select(selectQuery, { count: 'exact' });
 
-        // Apply filters
         if (filters) {
             if (filters.search) {
-                // Search in name OR code
+                // Buscar en nombre O código
                 query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`);
             }
             if (filters.status) {
@@ -156,15 +155,14 @@ export class ProductService extends BaseService<Product> {
             }
         }
 
-        // Apply Sort
+        // Sort
         if (sort && sort.column) {
             query = query.order(sort.column, { ascending: sort.direction === 'asc' });
         } else {
             query = query.order('created_at', { ascending: false });
         }
 
-        // Pagination
-        // Pagination
+        // Paginación
         if (pageSize > 0) {
             const from = (page - 1) * pageSize;
             const to = from + pageSize - 1;
@@ -175,21 +173,21 @@ export class ProductService extends BaseService<Product> {
 
         if (error) throw error;
 
-        // Flatten the structure: product_categories: [{ category: { id, name } }] -> categories: [{ id, name }]
+        // Aplanar la estructura: product_categories: [{ category: { id, name } }] -> categories: [{ id, name }]
         const products = (data || []).map((p: any) => ({
             ...p,
-            categories: p.product_categories?.map((pc: any) => pc.category) || [] // Now categories is array of objects
+            categories: p.product_categories?.map((pc: any) => pc.category) || [] // Ahora categories es un array de objetos
         })) as Product[];
 
         return { data: products, count: count || 0 };
     }
 
     /**
-     * Get product price effectively at a given date
-     * Checks tariffs first, fallback to base price
+     * Obtener el precio efectivo del producto en una fecha dada
+     * Verifica tarifas primero, recurre al precio base si no hay tarifas aplicables.
      */
     async getPriceAtDate(id: number, date: string): Promise<number> {
-        // 1. Get Product with Tariffs
+        // 1. Obtener Producto con Tarifas
         const { data: product, error } = await this.client
             .from(this.table)
             .select('price, tariffs')
@@ -198,12 +196,12 @@ export class ProductService extends BaseService<Product> {
 
         if (error || !product) throw error || new Error('Producto no encontrado');
 
-        // 2. Check Tariffs
+        // 2. Verificar Tarifas
         const tariffs = (product.tariffs as any[]) || [];
         const targetDate = new Date(date);
 
-        // Sort tariffs by start_date desc to find the most recent applicable one
-        // Filter valid tariffs for the date
+        // Ordenar tarifas por start_date desc para encontrar la más reciente aplicable
+        // Filtrar tarifas válidas para la fecha
         const applicableTariff = tariffs
             .filter((t: any) => {
                 const start = new Date(t.start_date);

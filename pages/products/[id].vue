@@ -25,7 +25,7 @@ const formRef = ref<any>(null)
 
 onMounted(async () => {
     try {
-        // Use getByIdWithCategories to pre-fill selections
+        // Usar getByIdWithCategories para pre-rellenar las selecciones
         const data = await service.getByIdWithCategories(id)
         if (!data) {
             alert('Producto no encontrado')

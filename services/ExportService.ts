@@ -17,14 +17,14 @@ export class ExportService {
      * @param filename Filename without extension
      */
     static exportToExcel(data: any[], columns: ExportColumn[], filename: string) {
-        // Transform data based on columns
+        // Transformar datos basados en columnas
         const rows = data.map(row => {
             const newRow: any = {};
             columns.forEach(col => {
-                // Handle nested keys (e.g. 'category.name') if key handles dots, 
-                // but here we rely on simple key access or use formatter for complex logic.
-                // For simplicity, we just take row[key] but we could implement dot notation getter if needed.
-                // Since we have specific requirements for Products (categories list), formatter is the way to go.
+                // Manejar claves anidadas (ej: 'category.name') si la clave maneja puntos, 
+                // pero aquí dependemos de acceso simple o usamos formateador para lógica compleja.
+                // Por simplicidad, tomamos row[key] pero podríamos implementar un getter de notación por puntos si fuera necesario.
+                // Dado que tenemos requisitos específicos para Productos (lista de categorías), el formateador es el camino a seguir.
 
                 const val = row[col.key];
                 newRow[col.header] = col.formatter ? col.formatter(val, row) : val;
@@ -32,17 +32,17 @@ export class ExportService {
             return newRow;
         });
 
-        // Create workbook and worksheet
+        // Crear libro y hoja
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(rows);
 
-        // Auto-width columns (optional but nice)
-        const wscols = columns.map(col => ({ wch: 20 })); // Default width 20
+        // Auto-ancho de columnas (opcional pero agradable)
+        const wscols = columns.map(col => ({ wch: 20 })); // Ancho por defecto 20
         ws['!cols'] = wscols;
 
         XLSX.utils.book_append_sheet(wb, ws, "Data");
 
-        // Generate file
+        // Generar archivo
         XLSX.writeFile(wb, `${filename}.xlsx`);
     }
 
@@ -55,7 +55,7 @@ export class ExportService {
     static exportToPDF(data: any[], columns: ExportColumn[], filename: string) {
         const doc = new jsPDF();
 
-        // Prepare table body
+        // Preparar cuerpo de la tabla
         const body = data.map(row => {
             return columns.map(col => {
                 const val = row[col.key];
@@ -63,13 +63,12 @@ export class ExportService {
             });
         });
 
-        // Prepare table headers
+        // Preparar cabeceras de la tabla
         const head = [columns.map(col => col.header)];
 
         autoTable(doc, {
             head: head,
             body: body,
-            // Styling is not important, but defaults are usually fine
         });
 
         doc.save(`${filename}.pdf`);
