@@ -13,9 +13,21 @@ export class ProductService extends BaseService<Product> {
     protected table = 'products';
 
     /**
+     * Soft Delete: Marcar como eliminado en lugar de borrar físicamente
+     */
+    override async delete(id: number): Promise<void> {
+        const { error } = await this.client
+            .from(this.table)
+            .update({ deleted_at: new Date() })
+            .eq('id', id);
+
+        if (error) throw error;
+    }
+
+    /**
      * Crear producto con validación
      */
-    async create(item: Partial<Product>): Promise<Product> {
+    override async create(item: Partial<Product>): Promise<Product> {
         // Asegurar tipo producto
         item.type = 'product';
 
@@ -42,7 +54,7 @@ export class ProductService extends BaseService<Product> {
     /**
      * Actualizar producto con validación
      */
-    async update(id: number, item: Partial<Product>): Promise<Product> {
+    override async update(id: number, item: Partial<Product>): Promise<Product> {
         const errors = ProductValidator.validate(item);
         if (errors.length > 0) {
             throw new Error(errors.map(e => e.message).join('\n'));
@@ -108,6 +120,7 @@ export class ProductService extends BaseService<Product> {
             .from(this.table)
             .select('*, product_categories(category_id)') // Join select
             .eq('id', id)
+            .is('deleted_at', null)
             .single();
 
         if (error) throw error;
@@ -140,7 +153,8 @@ export class ProductService extends BaseService<Product> {
 
         let query = this.client
             .from(this.table)
-            .select(selectQuery, { count: 'exact' });
+            .select(selectQuery, { count: 'exact' })
+            .is('deleted_at', null);
 
         if (filters) {
             if (filters.search) {
@@ -192,6 +206,7 @@ export class ProductService extends BaseService<Product> {
             .from(this.table)
             .select('price, tariffs')
             .eq('id', id)
+            .is('deleted_at', null)
             .single();
 
         if (error || !product) throw error || new Error('Producto no encontrado');
